@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="login_button">Login</string>
+    <string name="main_floating_button">Main Floating Button</string>
+    <string name="second_floating_button">Second Floating Button</string>
+    <string name="to_do_list_button">To Do List Button</string>
+    <string name="search">Search</string>
+    <string name="enter_search_query">Enter search query</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="call_button">Call Button</string>
+    <string name="email_button">Email Button</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="full_name">Full Name</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="birthday">Birthday</string>
+    <string name="gender">Gender</string>
+    <string name="bio">Bio</string>
+    <string name="place">Place</string>
+    <string name="country">Country</string>
+    <string name="address">Address</string>
+    <string name="job_profile">Job Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+
+    <string name="password_hint">Password Hint</string>
+
+    <string name="full_name_hint">Enter Full Name</string>
+    <string name="username_hint">Enter Username</string>
+    <string name="email_hint">Enter Email</string>
+    <string name="phone_hint">Enter Phone Number</string>
+    <string name="birthday_hint">Enter Birthday</string>
+    <string name="gender_hint">Enter Gender</string>
+    <string name="bio_hint">Enter Bio</string>
+    <string name="place_hint">Enter Place</string>
+    <string name="country_hint">Enter Country</string>
+    <string name="address_hint">Enter Address</string>
+    <string name="job_profile_hint">Enter Job Profile</string>
+    <string name="save_changes">Save Changes</string>
+    <string-array name="gender_array">
+        <item>Enter your Gender</item>
+        <item>Male</item>
+        <item>Female</item>
+        <item>Prefer Not to Say</item>
+    </string-array>
+</resources>
