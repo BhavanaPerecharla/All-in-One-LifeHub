@@ -177,11 +177,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "Show Timetable Image", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if (itemId == R.id.menu_timetable) {
-            startActivity(new Intent(LoginActivity.this, Timetable.class));
-            Toast.makeText(this, "Show Timetable Image", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (itemId == R.id.menu_calculator) {
+        else if (itemId == R.id.menu_calculator) {
             startActivity(new Intent(LoginActivity.this, Calculator.class));
             Toast.makeText(this, "Open Calculator", Toast.LENGTH_SHORT).show();
             return true;

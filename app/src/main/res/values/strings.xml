@@ -44,4 +44,9 @@
         <item>Female</item>
         <item>Prefer Not to Say</item>
     </string-array>
+    <string name="huge_name"> Something huge to be displayed</string>
+    <string-array name="Cars">
+        <item> Mustang </item>
+        <item> Lambo </item>
+    </string-array>
 </resources>
