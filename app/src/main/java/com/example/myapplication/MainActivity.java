@@ -99,13 +99,32 @@ class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return isValid;
     }
-}
+    public boolean userExistsWithDOB(String identifier, String dateOfBirth) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USERS + " WHERE (" +
+                COLUMN_USERNAME + "=? OR " +
+                COLUMN_EMAIL + "=?) AND " +
+                COLUMN_BIRTHDAY + "=?";
+        Cursor cursor = db.rawQuery(query, new String[]{identifier, identifier, dateOfBirth});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
 
+    // New method to update password
+    public void updatePassword(String identifier, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String updateQuery = "UPDATE " + TABLE_USERS + " SET " + COLUMN_PASSWORD + "=? WHERE " +
+                COLUMN_USERNAME + "=? OR " + COLUMN_EMAIL + "=?";
+        db.execSQL(updateQuery, new Object[]{newPassword, identifier, identifier});
+    }
+
+}
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword;
-    private Button btnLogin;
+    private Button btnLogin, btnForgotPassword;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -117,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnForgotPassword = findViewById(R.id.btnForgotPassword);
+
         Button btnSignUpPage = findViewById(R.id.btnSignUpPage);
         btnSignUpPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,8 +153,15 @@ public class MainActivity extends AppCompatActivity {
                 login();
             }
         });
-    }
 
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
 
     private void login() {
         String identifier = etUsername.getText().toString().trim(); // Assuming this EditText can hold username, email, or phone number
@@ -152,8 +180,4 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Invalid credentials. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-
-
 }

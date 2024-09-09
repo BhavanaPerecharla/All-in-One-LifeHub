@@ -16,6 +16,9 @@
             android:name=".sent_mail_item"
             android:exported="false" />
         <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".SentMailsHistoryActivity"
             android:exported="false" />
         <activity
