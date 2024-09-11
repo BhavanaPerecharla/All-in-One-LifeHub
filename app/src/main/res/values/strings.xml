@@ -1,4 +1,18 @@
 <resources>
+
+
+
+    <!-- Action Button Style -->
+    <style name="ActionButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:backgroundTint">#CDDC39</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <string name="app_name">My Application</string>
     <string name="login_button">Login</string>
     <string name="main_floating_button">Main Floating Button</string>
