@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,10 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.provider.ContactsContract;
+import android.view.inputmethod.InputMethodManager;
 
 public class call_dial extends AppCompatActivity {
     private static final int REQUEST_CALL_PERMISSION = 1;
@@ -31,46 +34,39 @@ public class call_dial extends AppCompatActivity {
         saveBtn = findViewById(R.id.saveBtn);
 
         // Clear button functionality
-        clearBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                phoneNumberEditText.setText("");
-            }
-        });
+        clearBtn.setOnClickListener(v -> phoneNumberEditText.setText(""));
 
         // Call button functionality
-        callBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String phoneNumber = phoneNumberEditText.getText().toString().trim();
-                if (!phoneNumber.isEmpty()) {
-                    if (ContextCompat.checkSelfPermission(call_dial.this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                        // Permission granted, make the call
-                        Intent intent = new Intent(Intent.ACTION_CALL);
-                        intent.setData(Uri.parse("tel:" + phoneNumber));
-                        startActivity(intent);
-                    } else {
-                        // Request CALL_PHONE permission
-                        ActivityCompat.requestPermissions(call_dial.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CALL_PERMISSION);
-                    }
+        callBtn.setOnClickListener(v -> {
+            String phoneNumber = phoneNumberEditText.getText().toString().trim();
+            if (!phoneNumber.isEmpty()) {
+                if (ContextCompat.checkSelfPermission(call_dial.this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted, make the call
+                    makePhoneCall(phoneNumber);
+                } else {
+                    // Request CALL_PHONE permission
+                    ActivityCompat.requestPermissions(call_dial.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CALL_PERMISSION);
                 }
+            } else {
+                Toast.makeText(call_dial.this, "Please enter a phone number", Toast.LENGTH_SHORT).show();
             }
         });
+        saveBtn.setOnClickListener(v -> startActivity(new Intent(call_dial.this, Contacts.class)));
 
-        // Save button functionality
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String phoneNumber = phoneNumberEditText.getText().toString();
-                Intent intent = new Intent(Intent.ACTION_INSERT);
-                intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-                intent.putExtra(ContactsContract.Intents.Insert.PHONE, phoneNumber);
-                startActivity(intent);
-            }
-        });
     }
 
-    // Handle the result of permission request
+    private void makePhoneCall(String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getCurrentFocus() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+        startActivity(intent);
+    }
+
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -78,9 +74,7 @@ public class call_dial extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, make the call
                 String phoneNumber = phoneNumberEditText.getText().toString().trim();
-                Intent intent = new Intent(Intent.ACTION_CALL);
-                intent.setData(Uri.parse("tel:" + phoneNumber));
-                startActivity(intent);
+                makePhoneCall(phoneNumber);
             } else {
                 // Permission denied, handle it (e.g., show a message)
                 Toast.makeText(this, "Permission Denied to make calls", Toast.LENGTH_SHORT).show();

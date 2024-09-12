@@ -40,4 +40,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("org.mozilla:rhino:1.7.13")
+    implementation("com.google.code.gson:gson:2.8.9")
 }
