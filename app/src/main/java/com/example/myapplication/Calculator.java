@@ -11,7 +11,7 @@ import org.mozilla.javascript.Scriptable;
 public class Calculator extends AppCompatActivity implements View.OnClickListener {
 
     TextView resultTv, solutionTv;
-    MaterialButton buttonC, buttonBrackOpen, buttonBrackClose;
+    MaterialButton buttonC, buttonBracketOpen, buttonBracketClose;
     MaterialButton buttonDivide, buttonMultiply, buttonPlus, buttonMinus, buttonEquals;
     MaterialButton button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
     MaterialButton buttonAC, buttonDot;
@@ -25,8 +25,8 @@ public class Calculator extends AppCompatActivity implements View.OnClickListene
         resultTv = findViewById(R.id.result_tv);
         solutionTv = findViewById(R.id.solution_tv);
         buttonC = findViewById(R.id.button_c);
-        buttonBrackOpen = findViewById(R.id.button_open_bracket);
-        buttonBrackClose = findViewById(R.id.button_close_bracket);
+        buttonBracketOpen = findViewById(R.id.button_open_bracket);
+        buttonBracketClose = findViewById(R.id.button_close_bracket);
         buttonDivide = findViewById(R.id.button_divide);
         buttonMultiply = findViewById(R.id.button_multiply);
         buttonPlus = findViewById(R.id.button_plus);
@@ -51,8 +51,8 @@ public class Calculator extends AppCompatActivity implements View.OnClickListene
 
     private void setListeners() {
         buttonC.setOnClickListener(this);
-        buttonBrackOpen.setOnClickListener(this);
-        buttonBrackClose.setOnClickListener(this);
+        buttonBracketOpen.setOnClickListener(this);
+        buttonBracketClose.setOnClickListener(this);
         buttonDivide.setOnClickListener(this);
         buttonMultiply.setOnClickListener(this);
         buttonPlus.setOnClickListener(this);

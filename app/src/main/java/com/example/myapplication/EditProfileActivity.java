@@ -1,5 +1,5 @@
 package com.example.myapplication;
-
+import android.app.DatePickerDialog;
 import android.graphics.BitmapFactory;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -14,32 +14,31 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import android.app.DatePickerDialog;
 import java.util.Calendar;
-
 
 public class EditProfileActivity extends AppCompatActivity {
     private Spinner spinnerGender;
     private ImageView profileImage;
     private EditText etUsername, etFullName, etEmail, etPhone, etBirthday, etBio, etAddress, etState, etCountry, etAge;
-    private Button btnSaveChanges;
+    private Uri imageUri;
     private DatabaseHelper databaseHelper;
     private String username;
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private Uri imageUri;
-    private ArrayAdapter<CharSequence> adapter;
+
+    // Remove unnecessary class fields
+    private ActivityResultLauncher<Intent> pickImageLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-        spinnerGender = findViewById(R.id.spinnerGender);
 
-        // Initialize views
+        spinnerGender = findViewById(R.id.spinnerGender);
         profileImage = findViewById(R.id.editProfileImage);
         etUsername = findViewById(R.id.etUsername);
         etFullName = findViewById(R.id.etFullName);
@@ -51,33 +50,77 @@ public class EditProfileActivity extends AppCompatActivity {
         etState = findViewById(R.id.etState);
         etCountry = findViewById(R.id.etCountry);
         etAge = findViewById(R.id.etAge);
-        btnSaveChanges = findViewById(R.id.btnSaveChanges);
+        Button btnSaveChanges = findViewById(R.id.btnSaveChanges); // Local variable
 
-        // Set up the spinner for gender selection
-        adapter = ArrayAdapter.createFromResource(this,
+        // Set up the gender spinner locally
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.gender_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapter);
 
-        // Initialize the database helper
         databaseHelper = new DatabaseHelper(this);
-
-        // Get the username from intent
         username = getIntent().getStringExtra("USERNAME");
 
-        // Load user profile data
         if (username != null) {
-            loadProfileData(username);
+            loadProfileData(username, adapter); // Pass adapter to loadProfileData
         }
 
-        // Set up profile photo picker
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        imageUri = result.getData().getData();
+                        profileImage.setImageURI(imageUri);
+                    }
+                }
+        );
+
         profileImage.setOnClickListener(v -> openFileChooser());
 
-        // Set up save changes button with validation
         btnSaveChanges.setOnClickListener(view -> validateAndSaveProfile());
     }
 
-    // Open DatePicker for birthday
+    private void openFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        pickImageLauncher.launch(intent);
+    }
+
+    private void loadProfileData(String username, ArrayAdapter<CharSequence> adapter) {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        try (Cursor cursor = db.query("users", null, "username = ?", new String[]{username}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                etUsername.setText(cursor.getString(cursor.getColumnIndexOrThrow("username")));
+                etFullName.setText(cursor.getString(cursor.getColumnIndexOrThrow("full_name")));
+                etEmail.setText(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+                etPhone.setText(cursor.getString(cursor.getColumnIndexOrThrow("phone")));
+                etBirthday.setText(cursor.getString(cursor.getColumnIndexOrThrow("birthday")));
+
+                // Set gender in spinner
+                String gender = cursor.getString(cursor.getColumnIndexOrThrow("gender"));
+                spinnerGender.setSelection(adapter.getPosition(gender)); // Use adapter here
+
+                etBio.setText(cursor.getString(cursor.getColumnIndexOrThrow("bio")));
+                etAddress.setText(cursor.getString(cursor.getColumnIndexOrThrow("address")));
+                etState.setText(cursor.getString(cursor.getColumnIndexOrThrow("state")));
+                etCountry.setText(cursor.getString(cursor.getColumnIndexOrThrow("country")));
+                etAge.setText(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("age"))));
+
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("profile_photo"));
+                if (imageBytes != null) {
+                    profileImage.setImageBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length));
+                }
+            } else {
+                Toast.makeText(this, "No data found for username: " + username, Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e("EditProfileActivity", "Error loading profile data", e);
+            Toast.makeText(this, "Error loading profile data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        etBirthday.setOnClickListener(v -> openDatePicker());
+    }
+    // Open DatePicker for birthday selection
     private void openDatePicker() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -87,10 +130,11 @@ public class EditProfileActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 EditProfileActivity.this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // Format the selected date as a string (e.g., YYYY-MM-DD)
                     String selectedDate = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
                     etBirthday.setText(selectedDate);
 
-                    // Automatically calculate age based on selected date
+                    // Automatically calculate age based on the selected date
                     int calculatedAge = calculateAge(selectedYear, selectedMonth, selectedDay);
                     etAge.setText(String.valueOf(calculatedAge));
                 },
@@ -103,69 +147,13 @@ public class EditProfileActivity extends AppCompatActivity {
     private int calculateAge(int year, int month, int day) {
         Calendar today = Calendar.getInstance();
         int age = today.get(Calendar.YEAR) - year;
-        if (today.get(Calendar.MONTH) < month || (today.get(Calendar.MONTH) == month && today.get(Calendar.DAY_OF_MONTH) < day)) {
+
+        // If the current date is before the birthday this year, subtract one year from the age
+        if (today.get(Calendar.MONTH) < month ||
+                (today.get(Calendar.MONTH) == month && today.get(Calendar.DAY_OF_MONTH) < day)) {
             age--;
         }
         return age;
-    }
-
-    private void openFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            profileImage.setImageURI(imageUri);
-        }
-    }
-
-    // Load profile data from the database for the given username
-    private void loadProfileData(String username) {
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor cursor = null;
-
-        try {
-            cursor = db.query("users", null, "username = ?", new String[]{username}, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                etUsername.setText(cursor.getString(cursor.getColumnIndexOrThrow("username"))); // Only display username, not for editing
-                etFullName.setText(cursor.getString(cursor.getColumnIndexOrThrow("full_name")));
-                etEmail.setText(cursor.getString(cursor.getColumnIndexOrThrow("email")));
-                etPhone.setText(cursor.getString(cursor.getColumnIndexOrThrow("phone")));
-                etBirthday.setText(cursor.getString(cursor.getColumnIndexOrThrow("birthday")));
-
-                // Set gender in spinner
-                String gender = cursor.getString(cursor.getColumnIndexOrThrow("gender"));
-                spinnerGender.setSelection(adapter.getPosition(gender));
-
-                etBio.setText(cursor.getString(cursor.getColumnIndexOrThrow("bio")));
-                etAddress.setText(cursor.getString(cursor.getColumnIndexOrThrow("address")));
-                etState.setText(cursor.getString(cursor.getColumnIndexOrThrow("state")));
-                etCountry.setText(cursor.getString(cursor.getColumnIndexOrThrow("country")));
-                etAge.setText(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("age"))));
-
-                // Load profile image if available
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow("profile_photo"));
-                if (imageBytes != null) {
-                    profileImage.setImageBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length));
-                }
-            } else {
-                Toast.makeText(this, "No data found for username: " + username, Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            Log.e("EditProfileActivity", "Error loading profile data", e);
-            Toast.makeText(this, "Error loading profile data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        } finally {
-            if (cursor != null) cursor.close();
-        }
-
-        // Set up birthday to open a DatePickerDialog
-        etBirthday.setOnClickListener(v -> openDatePicker());
     }
 
     // Validate and save the profile changes to the database
@@ -232,7 +220,7 @@ public class EditProfileActivity extends AppCompatActivity {
         values.put("country", country);
         values.put("age", Integer.parseInt(age));
 
-        // Handle profile photo if available
+        // Handle profile photo saving
         if (imageUri != null) {
             byte[] imageBytes = getImageBytes(imageUri);
             if (imageBytes != null) {
@@ -240,37 +228,28 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }
 
-        // Update the database with new values
-        int rowsAffected = db.update("users", values, "username=?", new String[]{username});
-
-        if (rowsAffected > 0) {
-            Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(EditProfileActivity.this, ProfileActivity.class);
-            intent.putExtra("USERNAME", username);
-            startActivity(intent);
-            finish();
+        long result = db.update("users", values, "username = ?", new String[]{username});
+        if (result == -1) {
+            Toast.makeText(this, "Failed to save changes", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Error updating profile", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Convert image URI to byte array
+    // Helper method to convert image URI to byte array
     private byte[] getImageBytes(Uri uri) {
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
+        try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
+            if (inputStream == null) return null;
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 byteArrayOutputStream.write(buffer, 0, bytesRead);
             }
-            inputStream.close();
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("EditProfileActivity", "Error reading image bytes", e);
             return null;
         }
     }
 }
-
-

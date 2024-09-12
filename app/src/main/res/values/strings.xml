@@ -1,8 +1,4 @@
 <resources>
-
-
-
-    <!-- Action Button Style -->
     <style name="ActionButtonStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -12,9 +8,38 @@
         <item name="android:drawablePadding">8dp</item>
         <item name="android:textSize">16sp</item>
     </style>
-
-    <string name="app_name">My Application</string>
+    <string name="menu_profile">Show My Profile</string>
+    <string name="menu_timetable">Show Timetable</string>
+    <string name="menu_calculator">Open Calculator</string>
+    <string name="menu_email">Open Email</string>
+    <string name="menu_logout">Logout</string>
+    <string name="phone_number_format">Phone number: %1$s</string>
+    <string name="no_user_info">No user information available.</string>
+    <string name="no_user_details">No user details found.</string>
+    <string name="error_retrieving_user_details">Error retrieving user details.</string>
+    <string name="username_label">USERNAME: %1$s</string>
+    <string name="full_name_label">FULL NAME: %1$s</string>
+    <string name="email_label">EMAIL: %1$s</string>
+    <string name="phone_label">PHONE: %1$s</string>
+    <string name="birthday_label">BIRTHDAY: %1$s</string>
+    <string name="gender_label">GENDER: %1$s</string>
+    <string name="bio_label">BIO: %1$s</string>
+    <string name="address_label">ADDRESS: %1$s</string>
+    <string name="state_label">STATE: %1$s</string>
+    <string name="country_label">COUNTRY: %1$s</string>
+    <string name="age_label">AGE: %1$d</string>
+    <string name="phone_number_error">Please enter a phone number</string>
+    <string name="permission_denied">Permission Denied to make calls</string>
+    <string name="app_name">ALL IN ONE SMART PHONE</string>
+    <string name="arg_alarm_obj">AlarmObject</string>
+    <string name="bundle_alarm_obj">BundleAlarmObject</string>
+    <string name="alarm_title">My Alarm</string>
+    <string name="dayNightTheme">DayNightTheme</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
     <string name="login_button">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="forgot_password">Forgot Password?</string>
     <string name="main_floating_button">Main Floating Button</string>
     <string name="second_floating_button">Second Floating Button</string>
     <string name="to_do_list_button">To Do List Button</string>
@@ -37,11 +62,7 @@
     <string name="address">Address</string>
     <string name="job_profile">Job Profile</string>
     <string name="edit_profile">Edit Profile</string>
-
-    <string name="password_hint">Password Hint</string>
-
     <string name="full_name_hint">Enter Full Name</string>
-    <string name="username_hint">Enter Username</string>
     <string name="email_hint">Enter Email</string>
     <string name="phone_hint">Enter Phone Number</string>
     <string name="birthday_hint">Enter Birthday</string>
@@ -58,9 +79,23 @@
         <item>Female</item>
         <item>Prefer Not to Say</item>
     </string-array>
-    <string name="huge_name"> Something huge to be displayed</string>
-    <string-array name="Cars">
-        <item> Mustang </item>
-        <item> Lambo </item>
-    </string-array>
+    <string name="to_do_list">To Do List</string>
+    <string name="youtube_search">YouTube Search</string>
+    <string name="add">Add</string>
+    <string name="contact_icon">Contact Icon</string>
+    <string name="add_task">Add Task</string>
+    <string name="ok">OK</string>
+    <string name="contact_book">Contact Book</string>
+    <string name="search_hint">Enter your search query...</string>
+    <string name="background_image_description">Background Image</string>
+
+    <string name="name_hint">Name</string>
+    <string name="phone_number_hint">Phone Number</string>
+    <string name="edit_contact_title">Edit Contact</string>
+    <string name="edit_contact_positive_button">Save</string>
+    <string name="edit_contact_negative_button">Cancel</string>
+    <string name="delete_contact_title">Delete Contact</string>
+    <string name="delete_contact_message">Are you sure you want to delete this contact?</string>
+    <string name="delete_contact_positive_button">Yes</string>
+    <string name="delete_contact_negative_button">No</string>
 </resources>

@@ -1,7 +1,6 @@
 package com.example.myapplication;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,7 +18,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -29,6 +29,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
 class Contact {
     private String name;
     private String phoneNumber;
@@ -60,16 +61,27 @@ class Contact {
     }
 }
 
-
 public class Contacts extends AppCompatActivity {
-    private static final int REQUEST_CODE_ADD_CONTACT = 1;
     private static final int REQUEST_CALL_PERMISSION = 1;
     private static final String CONTACTS_KEY = "contacts";
     private List<Contact> contacts = new ArrayList<>();
     private ArrayAdapter<Contact> adapter;
     private SharedPreferences sharedPreferences;
-    private String phoneNumberToCall;
     private Contact contactToDelete;
+
+    private final ActivityResultLauncher<Intent> addContactResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    String phoneNumber = result.getData().getStringExtra("EXTRA_PHONE_NUMBER");
+                    String contactName = result.getData().getStringExtra("EXTRA_CONTACT_NAME");
+                    if (phoneNumber != null && contactName != null) {
+                        Contact newContact = new Contact(contactName, phoneNumber);
+                        contacts.add(newContact);
+                        saveContacts();
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +101,7 @@ public class Contacts extends AppCompatActivity {
         ImageButton dialPadButton = findViewById(R.id.imageButton3);
         dialPadButton.setOnClickListener(v -> {
             Intent intent = new Intent(Contacts.this, call_dial.class);
-            startActivityForResult(intent, REQUEST_CODE_ADD_CONTACT);
+            addContactResultLauncher.launch(intent);
         });
 
         contactListView.setOnItemClickListener((parent, view, position, id) -> {
@@ -143,21 +155,6 @@ public class Contacts extends AppCompatActivity {
         return phoneNumber.matches("\\d+"); // Check for digits only
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_ADD_CONTACT && resultCode == RESULT_OK && data != null) {
-            String phoneNumber = data.getStringExtra("EXTRA_PHONE_NUMBER");
-            String contactName = data.getStringExtra("EXTRA_CONTACT_NAME");
-            if (phoneNumber != null && contactName != null) {
-                Contact newContact = new Contact(contactName, phoneNumber);
-                contacts.add(newContact);
-                saveContacts();
-                adapter.notifyDataSetChanged();
-            }
-        }
-    }
-
     private void makePhoneCall(String phoneNumber) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(Intent.ACTION_CALL);
@@ -173,9 +170,7 @@ public class Contacts extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CALL_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (phoneNumberToCall != null) {
-                    makePhoneCall(phoneNumberToCall);
-                }
+                // Permission granted, no action needed as calling is handled in makePhoneCall
             } else {
                 Toast.makeText(this, "Permission denied to make calls", Toast.LENGTH_SHORT).show();
             }
@@ -192,6 +187,8 @@ public class Contacts extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        if (info == null) return super.onContextItemSelected(item);
+
         int position = info.position;
         Contact selectedContact = contacts.get(position);
 
@@ -236,20 +233,20 @@ public class Contacts extends AppCompatActivity {
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.create().show();
     }
 
     private void showDeleteConfirmationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Delete Contact")
-                .setMessage("Are you sure you want to delete this contact?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    contacts.remove(contactToDelete);
-                    saveContacts();
-                    adapter.notifyDataSetChanged();
-                })
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                .show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Contact");
+        builder.setMessage("Are you sure you want to delete this contact?");
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            contacts.remove(contactToDelete);
+            saveContacts();
+            adapter.notifyDataSetChanged();
+            contactToDelete = null; // Reset after deletion
+        });
+        builder.setNegativeButton("No", (dialog, which) -> contactToDelete = null); // Reset if canceled
+        builder.create().show();
     }
 }

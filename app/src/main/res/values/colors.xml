@@ -11,4 +11,7 @@
     <color name="green">#00AE60</color>
     <color name="red">#FF3B73</color>
     <color name="teal">#00838F</color>
+    <color name="translucent_grey">#D38F8E8E</color>
+    <color name="toggleButtonBg">#7B1FA2</color>
+    <color name="textColor">#7B1FA2</color>
 </resources>

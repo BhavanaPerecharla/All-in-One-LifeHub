@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     Button b1;
     String query = "";
     private TextView timeTextView, dateTextView;
-    private ImageButton ib, b2;
+
     private final Handler handler = new Handler();
 
     private final Runnable updateTimeRunnable = new Runnable() {
@@ -55,8 +55,8 @@ public class LoginActivity extends AppCompatActivity {
         b1 = findViewById(R.id.button9);
         timeTextView = findViewById(R.id.timeTextView);
         dateTextView = findViewById(R.id.dateTextView);
-        ib = findViewById(R.id.imageButton);
-        b2 = findViewById(R.id.imageButton2);
+        ImageButton ib = findViewById(R.id.imageButton);
+        ImageButton  b2 = findViewById(R.id.imageButton2);
         Toolbar toolbar = findViewById(R.id.toolbar);
         Intent intent = getIntent();
         String identifier = intent.getStringExtra("USERNAME");

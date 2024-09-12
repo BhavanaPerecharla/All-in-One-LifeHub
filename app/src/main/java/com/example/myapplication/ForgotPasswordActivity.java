@@ -1,10 +1,8 @@
 package com.example.myapplication;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -17,7 +15,6 @@ import java.util.Calendar;
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private EditText etUsernameOrEmail, etDateOfBirth;
-    private Button btnResetPassword;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -28,23 +25,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         // Initialize views
         etUsernameOrEmail = findViewById(R.id.etUsernameOrEmail);
         etDateOfBirth = findViewById(R.id.etDateOfBirth);
-        btnResetPassword = findViewById(R.id.btnResetPassword);
         databaseHelper = new DatabaseHelper(this);
 
-        // Set up the DatePicker for the Date of Birth field
-        etDateOfBirth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker();
-            }
-        });
+        // Set up the DatePicker for the Date of Birth field using lambda
+        etDateOfBirth.setOnClickListener(v -> showDatePicker());
 
-        btnResetPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                resetPassword();
-            }
-        });
+        // Reset password button - this can be converted to a local variable
+        Button btnResetPassword = findViewById(R.id.btnResetPassword);
+        btnResetPassword.setOnClickListener(view -> resetPassword());
     }
 
     private void showDatePicker() {
@@ -54,15 +42,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        // Show DatePickerDialog
+        // Show DatePickerDialog using lambda
         DatePickerDialog datePickerDialog = new DatePickerDialog(ForgotPasswordActivity.this,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
-                        // Format the date and set it to the EditText
-                        String dateOfBirth = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
-                        etDateOfBirth.setText(dateOfBirth);
-                    }
+                (DatePicker view, int selectedYear, int selectedMonth, int selectedDay) -> {
+                    // Format the date and set it to the EditText
+                    String dateOfBirth = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
+                    etDateOfBirth.setText(dateOfBirth);
                 }, year, month, day);
 
         datePickerDialog.show();
@@ -94,17 +79,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Reset Password")
                 .setView(newPasswordInput)
-                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String newPassword = newPasswordInput.getText().toString().trim();
-                        if (!newPassword.isEmpty()) {
-                            databaseHelper.updatePassword(identifier, newPassword);
-                            Toast.makeText(ForgotPasswordActivity.this, "Password updated successfully.", Toast.LENGTH_SHORT).show();
-                            finish(); // Close the activity after success
-                        } else {
-                            Toast.makeText(ForgotPasswordActivity.this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
-                        }
+                .setPositiveButton("Update", (DialogInterface dialog, int which) -> {
+                    String newPassword = newPasswordInput.getText().toString().trim();
+                    if (!newPassword.isEmpty()) {
+                        databaseHelper.updatePassword(identifier, newPassword);
+                        Toast.makeText(ForgotPasswordActivity.this, "Password updated successfully.", Toast.LENGTH_SHORT).show();
+                        finish(); // Close the activity after success
+                    } else {
+                        Toast.makeText(ForgotPasswordActivity.this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Cancel", null)

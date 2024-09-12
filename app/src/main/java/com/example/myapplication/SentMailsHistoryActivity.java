@@ -11,14 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-
 public class SentMailsHistoryActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewSentMails;
+
     private SentMailsAdapter adapter;
-    private Button buttonBack, buttonClearAll;
+    private ArrayList<String> sentMails;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +25,15 @@ public class SentMailsHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sent_mails_history);
 
         // Initialize views
-        recyclerViewSentMails = findViewById(R.id.recyclerViewSentMails);
-        buttonBack = findViewById(R.id.buttonBack);
-        buttonClearAll = findViewById(R.id.buttonClearAll);
+        RecyclerView recyclerViewSentMails = findViewById(R.id.recyclerViewSentMails);
+        Button  buttonBack = findViewById(R.id.buttonBack);
+        Button  buttonClearAll = findViewById(R.id.buttonClearAll);
 
         // Get sent mails from intent
-        ArrayList<String> sentMails = getIntent().getStringArrayListExtra("sentMails");
+        sentMails = getIntent().getStringArrayListExtra("sentMails");
+        if (sentMails == null) {
+            sentMails = new ArrayList<>();
+        }
 
         // Set up RecyclerView
         recyclerViewSentMails.setLayoutManager(new LinearLayoutManager(this));
@@ -39,27 +41,25 @@ public class SentMailsHistoryActivity extends AppCompatActivity {
         recyclerViewSentMails.setAdapter(adapter);
 
         // Handle back button
-        buttonBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish(); // Close the activity
-            }
-        });
+        buttonBack.setOnClickListener(v -> finish()); // Close the activity
 
         // Handle clear all button
-        buttonClearAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sentMails.clear(); // Clear the list
-                adapter.notifyDataSetChanged();
-                Toast.makeText(SentMailsHistoryActivity.this, "All sent mails deleted.", Toast.LENGTH_SHORT).show();
+        buttonClearAll.setOnClickListener(v -> {
+            // Remove items one by one
+            int size = sentMails.size();
+            for (int i = size - 1; i >= 0; i--) {
+                sentMails.remove(i);
+                adapter.notifyItemRemoved(i);
             }
+            Toast.makeText(SentMailsHistoryActivity.this, "All sent mails deleted.", Toast.LENGTH_SHORT).show();
         });
     }
 }
+
+
 class SentMailsAdapter extends RecyclerView.Adapter<SentMailsAdapter.ViewHolder> {
 
-    private ArrayList<String> sentMails;
+    private final ArrayList<String> sentMails;
 
     public SentMailsAdapter(ArrayList<String> sentMails) {
         this.sentMails = sentMails;
@@ -77,16 +77,13 @@ class SentMailsAdapter extends RecyclerView.Adapter<SentMailsAdapter.ViewHolder>
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.textViewMail.setText(sentMails.get(position));
 
-        // Handle delete button click
-        holder.buttonDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int currentPosition = holder.getAdapterPosition();
-                if (currentPosition != RecyclerView.NO_POSITION) { // Check if position is valid
-                    sentMails.remove(currentPosition);
-                    notifyItemRemoved(currentPosition);
-                    notifyItemRangeChanged(currentPosition, sentMails.size());
-                }
+        holder.buttonDelete.setOnClickListener(v -> {
+            int currentPosition = holder.getAdapterPosition();
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                sentMails.remove(currentPosition);
+                notifyItemRemoved(currentPosition);
+                // Notify item range change for efficiency
+                notifyItemRangeChanged(currentPosition, sentMails.size());
             }
         });
     }

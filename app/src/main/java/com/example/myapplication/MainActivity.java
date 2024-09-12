@@ -4,14 +4,12 @@ import android.content.Context;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.database.Cursor;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -124,7 +122,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
 public class MainActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword;
-    private Button btnLogin, btnForgotPassword;
+
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -135,32 +133,24 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnForgotPassword = findViewById(R.id.btnForgotPassword);
+        Button btnLogin = findViewById(R.id.btnLogin);
+        Button btnForgotPassword = findViewById(R.id.btnForgotPassword);
 
         Button btnSignUpPage = findViewById(R.id.btnSignUpPage);
-        btnSignUpPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
-                startActivity(intent);
-            }
+        btnSignUpPage.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
+            startActivity(intent);
         });
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                login();
-            }
+
+        btnLogin.setOnClickListener(view -> login());
+
+
+        btnForgotPassword.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
-        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void login() {

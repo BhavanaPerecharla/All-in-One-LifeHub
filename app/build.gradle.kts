@@ -41,4 +41,8 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("org.mozilla:rhino:1.7.13")
     implementation("com.google.code.gson:gson:2.8.9")
+    implementation("androidx.room:room-runtime:2.5.1")
+    annotationProcessor("androidx.room:room-compiler:2.5.1")
+    implementation("com.google.android.material:material:1.9.0")
+
 }

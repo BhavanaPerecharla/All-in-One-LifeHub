@@ -1,11 +1,14 @@
 package com.example.myapplication;
 
-import android.app.DatePickerDialog;
-import android.content.ContentValues;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+
+import android.content.ContentValues;
+import android.app.DatePickerDialog;
+
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,13 +27,12 @@ import java.util.Calendar;
 public class SignUpActivity extends AppCompatActivity {
 
     private EditText etNewUsername, etNewPassword, etFullName, etEmail, etPhone, etAddress, etAge, etState, etCountry, etBio;
-    private TextView tvBirthday,tvProfilePhotoPrompt;
+    private TextView tvBirthday;
     private Spinner spGender;
-    private Button btnSignUp;
     private ImageView ivProfilePhoto;
     private DatabaseHelper databaseHelper;
-    private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imageUri;
+    private ActivityResultLauncher<String> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +56,17 @@ public class SignUpActivity extends AppCompatActivity {
         etState = findViewById(R.id.etState);
         etCountry = findViewById(R.id.etCountry);
         etBio = findViewById(R.id.etBio);
-        btnSignUp = findViewById(R.id.btnSignUp);
+        Button btnSignUp = findViewById(R.id.btnSignUp);
 
+        // Initialize image picker launcher
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        imageUri = uri;
+                        ivProfilePhoto.setImageURI(imageUri);
+                    }
+                });
 
         // Set up gender spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -87,20 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void openFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            ivProfilePhoto.setImageURI(imageUri);
-        }
+        imagePickerLauncher.launch("image/*");
     }
 
     private void registerUser() {
@@ -116,6 +116,7 @@ public class SignUpActivity extends AppCompatActivity {
         String state = etState.getText().toString().trim();
         String country = etCountry.getText().toString().trim();
         String bio = etBio.getText().toString().trim();
+
         if (imageUri == null) {
             Toast.makeText(this, "Please upload a profile picture", Toast.LENGTH_SHORT).show();
             return;
@@ -203,8 +204,14 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private byte[] getImageBytes(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
+            if (inputStream == null) {
+                return null;
+            }
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -214,7 +221,7 @@ public class SignUpActivity extends AppCompatActivity {
             inputStream.close();
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("SignUpActivity", "Error reading image", e);
             return null;
         }
     }
@@ -227,5 +234,5 @@ public class SignUpActivity extends AppCompatActivity {
         }
         return age;
     }
-
 }
+

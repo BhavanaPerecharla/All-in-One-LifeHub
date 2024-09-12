@@ -1,8 +1,6 @@
 package com.example.myapplication;
-
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,7 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 public class call_dial extends AppCompatActivity {
     private static final int REQUEST_CALL_PERMISSION = 1;
     private EditText phoneNumberEditText;
-    private Button clearBtn, saveBtn, callBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +26,9 @@ public class call_dial extends AppCompatActivity {
         setContentView(R.layout.activity_call_dial);
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
-        clearBtn = findViewById(R.id.clearBtn);
-        callBtn = findViewById(R.id.callBtn);
-        saveBtn = findViewById(R.id.saveBtn);
+        Button clearBtn = findViewById(R.id.clearBtn);
+        Button callBtn = findViewById(R.id.callBtn);
+        Button saveBtn = findViewById(R.id.saveBtn);
 
         // Clear button functionality
         clearBtn.setOnClickListener(v -> phoneNumberEditText.setText(""));
@@ -48,11 +45,12 @@ public class call_dial extends AppCompatActivity {
                     ActivityCompat.requestPermissions(call_dial.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CALL_PERMISSION);
                 }
             } else {
-                Toast.makeText(call_dial.this, "Please enter a phone number", Toast.LENGTH_SHORT).show();
+                Toast.makeText(call_dial.this, R.string.phone_number_error, Toast.LENGTH_SHORT).show();
             }
         });
-        saveBtn.setOnClickListener(v -> startActivity(new Intent(call_dial.this, Contacts.class)));
 
+        // Save button functionality
+        saveBtn.setOnClickListener(v -> startActivity(new Intent(call_dial.this, Contacts.class)));
     }
 
     private void makePhoneCall(String phoneNumber) {
@@ -65,8 +63,6 @@ public class call_dial extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -77,7 +73,7 @@ public class call_dial extends AppCompatActivity {
                 makePhoneCall(phoneNumber);
             } else {
                 // Permission denied, handle it (e.g., show a message)
-                Toast.makeText(this, "Permission Denied to make calls", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -87,6 +83,6 @@ public class call_dial extends AppCompatActivity {
         Button btn = (Button) v;
         String digit = btn.getText().toString();
         String phoneNumber = phoneNumberEditText.getText().toString();
-        phoneNumberEditText.setText(phoneNumber + digit);
+        phoneNumberEditText.setText(String.format(getString(R.string.phone_number_format), phoneNumber + digit));
     }
 }
