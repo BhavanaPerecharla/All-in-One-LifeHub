@@ -14,4 +14,7 @@ In the ForgotPasswordActivity, the code initializes UI components for inputting 
 
 ![WhatsApp Image 2024-09-16 at 14 41 48](https://github.com/user-attachments/assets/dd68dc06-0d8a-4551-8609-9c5c419cc800)
 
+The LoginActivity initializes UI components, updates time and date continuously, and handles user actions like logging in, searching, and opening various activities. Floating action buttons toggle visibility of options, while a context menu allows users to change time and date. User information is managed through SharedPreferences, and logout functionality is included. Various listeners handle actions like opening the browser, navigating to other activities, and updating profile information.
+
+![WhatsApp Image 2024-09-16 at 14 53 28](https://github.com/user-attachments/assets/7cc40f60-ed68-4d17-b09b-bb1872f2b546)
 
