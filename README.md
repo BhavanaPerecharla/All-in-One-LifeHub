@@ -35,3 +35,25 @@ The List activity allows users to manage a list of items with features for addin
 The ProfileActivity displays detailed user profile information retrieved from a database. It initializes various TextView elements and an ImageView to show user details like username, full name, email, phone, birthday, and more. Depending on the type of identifier (username, email, or phone number), it queries the database and displays the user's information. It also includes functionality to handle profile picture loading and provides an option to navigate to an EditProfileActivity for modifications.!
 
 ![WhatsApp Image 2024-09-16 at 16 55 19](https://github.com/user-attachments/assets/b4b17257-b152-4eff-ba2d-0bf7a05f660d)
+
+The TimetableActivity includes a fade-in and fade-out animation loop for an ImageView. The code loads fade animations from resources and applies them to the ImageView to create a continuous transition effect. The delay between animations is set to 20 seconds using a Handler. Additionally, a button (b1) is set up to navigate to the LoginActivity, applying a fade transition animation during the activity switch. This creates a smooth and engaging user interface experience.
+
+![WhatsApp Image 2024-09-16 at 17 01 05](https://github.com/user-attachments/assets/d94217a8-8a55-453f-be93-e6c8685d204f)
+
+This CalculatorActivity is a simple calculator app. It initializes various buttons (numbers, operations, etc.) and sets click listeners for them. The onClick method handles the input, updating the display (solutionTv) and performing calculations using the JavaScript engine. Results are shown in resultTv, with error handling to avoid crashes from invalid inputs. The getResult method evaluates the expression, catching exceptions to return "Err" for invalid operations.
+
+![WhatsApp Image 2024-09-16 at 17 01 44](https://github.com/user-attachments/assets/99ac2b56-b526-4a1d-a9c9-f0d5eb895ced)
+
+This MailActivity allows users to send emails and view their sent mail history. It features input fields for recipient, subject, and message body, and validates the email address format. On sending an email, it uses an Intent with the mailto: scheme to launch the email client. Sent emails are saved in a history list, which can be viewed through a separate activity. If no email client is found, it notifies the user with a toast message.
+
+![WhatsApp Image 2024-09-16 at 17 05 30](https://github.com/user-attachments/assets/41c4aff8-1699-4a9a-80c4-5a21b72705d9)
+
+The greatness of this project lies in its integration of diverse functionalities, making it a comprehensive and practical tool for everyday tasks. It showcases a balanced blend of user interface design, validation, database operations, and animation. By offering seamless transitions between activities, robust data handling, and easy-to-use controls, the project provides an educational platform for developers and a practical, user-friendly experience. Its emphasis on error handling, data persistence, and visual feedback makes it not just a functional app but also a valuable learning resource for Android app development.
+
+
+
+
+
+
+
+
