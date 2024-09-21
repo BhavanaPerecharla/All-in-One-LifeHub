@@ -30,7 +30,8 @@ The ToDoList activity manages a list of tasks, allowing users to add, view, edit
 
 The List activity allows users to manage a list of items with features for adding and deleting items. It initializes views, including an EditText for input, an ImageView for adding items, and a ListView for displaying the list. Items are persisted using SharedPreferences, with the list updated accordingly. Users can add new items, which are saved and displayed, and delete items via a long-click context menu. Changes to the list are saved to SharedPreferences to persist between sessions.
 
-![WhatsApp Image 2024-09-16 at 16 53 32](https://github.com/user-attachments/assets/b8583c4b-5bdc-41b5-9cac-5b6640599bc2)
+![WhatsApp Image 2024-09-21 at 21 46 11](https://github.com/user-attachments/assets/66db2a98-7e18-4ec9-a2e3-70a4df36d3ee)
+
 
 The ProfileActivity displays detailed user profile information retrieved from a database. It initializes various TextView elements and an ImageView to show user details like username, full name, email, phone, birthday, and more. Depending on the type of identifier (username, email, or phone number), it queries the database and displays the user's information. It also includes functionality to handle profile picture loading and provides an option to navigate to an EditProfileActivity for modifications.!
 
